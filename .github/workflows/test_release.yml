@@ -576,5 +576,5 @@ jobs:
             -d "chat_id=$TELEGRAM_CHAT_ID" \
             -d "message_thread_id=$TELEGRAM_MESSAGE_THREAD_ID" \
             -d "text=Latest release: 
-            https://github.com/ShirkNeko/GKI_KernelSU_SUSFS/releases/tag/${{ env.NEW_TAG }}
+            https://github.com/ghost9394/GKI_KernelSU_SUSFS/releases/tag/${{ env.NEW_TAG }}
             ${{ env.RELEASE_NOTES }}"    
