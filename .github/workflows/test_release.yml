@@ -61,7 +61,7 @@ on:
         description: 'Get the latest KSU Manager at the same time?'
         required: true
         type: boolean
-        default: false
+        default: true
 
 jobs:
   get_manager:
