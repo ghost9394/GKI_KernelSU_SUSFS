@@ -87,7 +87,7 @@ jobs:
       REPO_OWNER: ghost9394
       REPO_NAME: GKI_KernelSU_SUSFS
       SUS_VERSION: ''
-      GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.ZZH_TOKEN }}
       RELEASE_NAME: "GKI内核: ${{ inputs.kernelsu_variant == 'Next' && 'KernelSU-' || '' }}${{ inputs.kernelsu_variant }}(${{ needs.get_manager.outputs.ksuVer }})  & SUSFS ${{ needs.get_manager.outputs.susVer }}"
       RELEASE_NOTES: |
         此处包含：**${{ inputs.kernelsu_variant == 'Next' && 'KernelSU-' || '' }}${{ inputs.kernelsu_variant }}**、SUSFS ${{ needs.get_manager.outputs.susVer }} ${{ inputs.use_zram && '、LZ4KD' || '' }}
@@ -187,6 +187,11 @@ jobs:
 
           declare -A BRANCH_MAP=(
             ["gki_android12_5_10"]="gki-android12-5.10"
+            ["gki_android13_5_10"]="gki-android13-5.10"
+            ["gki_android13_5_15"]="gki-android13-5.15"
+            ["gki_android14_5_15"]="gki-android14-5.15"
+            ["gki_android14_6_1"]="gki-android14-6.1"
+            ["gki_android15_6_6"]="gki-android15-6.6"
           )
 
           for var_name in "${!BRANCH_MAP[@]}"; do
@@ -204,11 +209,70 @@ jobs:
             fi
           done
 
+      - name: 将提交哈希值和链接添加到 `RELEASE_NOTES` 中，并将 KernelSU-Next 引用添加到 `RELEASE_NOTES` 中。
+        run: |
+          if [ "${{ inputs.kernelsu_variant }}" == "Official" ]; then
+            echo "This is the Official variant"
+            echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+            echo "$RELEASE_NOTES" >> $GITHUB_ENV
+            echo "Official 管理器:" >> $GITHUB_ENV
+            echo "-> https://github.com/tiann/KernelSU" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          elif [ "${{ inputs.kernelsu_variant }}" == "Next" ]; then
+            echo "This is the Next variant"
+            echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+            echo "$RELEASE_NOTES" >> $GITHUB_ENV
+            echo "Next 管理器:" >> $GITHUB_ENV
+            echo "-> https://github.com/KernelSU-Next/KernelSU-Next" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          elif [ "${{ inputs.kernelsu_variant }}" == "MKSU" ]; then
+            echo "This is the MKSU variant"
+            echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+            echo "$RELEASE_NOTES" >> $GITHUB_ENV
+            echo "MKSU 管理器:" >> $GITHUB_ENV
+            echo "-> https://github.com/5ec1cff/KernelSU" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          elif [ "${{ inputs.kernelsu_variant }}" == "SukiSU" ]; then
+            echo "This is the SukiSU variant"
+            echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+            echo "$RELEASE_NOTES" >> $GITHUB_ENV
+            echo "SukiSU 管理器:" >> $GITHUB_ENV
+            echo "-> https://github.com/ShirkNeko/SukiSU-Ultra" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "Unknown variant"
+          fi
+          
+      - name: 将提交哈希值和链接添加到 `RELEASE_NOTES` 中，并将 KernelSU-Next 引用添加到 `RELEASE_NOTES` 中。
+        run: |
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "$RELEASE_NOTES" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "LTO: thin" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "<details>" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "<summary>提交信息</summary>" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "提交的哈希值与链接(以下提交指的是,本次编译时,KSU或SUSFS所在的进度):" >> $GITHUB_ENV
+          echo "- **KernelSU为${{ inputs.kernelsu_variant == 'Next' && 'KernelSU-' || '' }}${{ inputs.kernelsu_variant }}${{ inputs.kernelsu_branch == 'Dev(开发)' && format('({0})', needs.get_manager.outputs.ksuVer) || '稳定版' }}** (提交): [$KSU_REF]($KSU_URL)" >> $GITHUB_ENV
+          echo "- **SUSFS4KSU** (提交):" >> $GITHUB_ENV
+          echo "  - gki-android12-5.10: [$COMMIT_HASH_gki_android12_5_10]($COMMIT_URL_gki_android12_5_10)" >> $GITHUB_ENV
+          echo "  - gki-android13-5.10: [$COMMIT_HASH_gki_android13_5_10]($COMMIT_URL_gki_android13_5_10)" >> $GITHUB_ENV
+          echo "  - gki-android13-5.15: [$COMMIT_HASH_gki_android13_5_15]($COMMIT_URL_gki_android13_5_15)" >> $GITHUB_ENV
+          echo "  - gki-android14-5.15: [$COMMIT_HASH_gki_android14_5_15]($COMMIT_URL_gki_android14_5_15)" >> $GITHUB_ENV
+          echo "  - gki-android14-6.1: [$COMMIT_HASH_gki_android14_6_1]($COMMIT_URL_gki_android14_6_1)" >> $GITHUB_ENV
+          echo "  - gki-android15-6.6: [$COMMIT_HASH_gki_android15_6_6]($COMMIT_URL_gki_android15_6_6)" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "</details>" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "点击下方 **【Assets】** 展开资源,底部还包含最新 **KSU管理器、CI构建SUSFS模块** " >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
           
       # Get the Latest Tag from GitHub
       - name: 生成和创建新标签
         env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ZZH_TOKEN }}
         run: |
             # Fetch the latest tag from GitHub (this is the latest tag based on the GitHub API)
             SUS_VERSION=${{ needs.get_manager.outputs.susVer }}
