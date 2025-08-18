@@ -53,9 +53,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - sub_level: "X"
-          os_patch_level: "lts"
-          revision: "r1"
+        - sub_level: "226"
+          os_patch_level: "2024-11"
+          revision: "r8"
     uses: ./.github/workflows/gki-kernel.yml
     secrets: inherit
     with:
