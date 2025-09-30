@@ -288,6 +288,8 @@ jobs:
             echo "Adding KernelSU SukiSU..."
             curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash $BRANCH
           fi
+      
+      
 
       - name: 为 KernelSU 变体安装 SUSFS 补丁
         run: |
@@ -381,6 +383,7 @@ jobs:
           fi
       
       - name: 升级LZ4至1.10.0
+        if: ${{ inputs.use_zram }}
         run: |
 
           echo "更改为配置目录: $CONFIG..."
